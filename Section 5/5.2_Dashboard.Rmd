@@ -1,0 +1,92 @@
+---
+title: "Social Media Analytics (October 2017)"
+output: flexdashboard::flex_dashboard
+---
+
+```{r include=FALSE}
+library("googleAuthR")
+library("googleAnalyticsR")
+library("ggplot2")
+library("reshape")
+library("ggsci")
+library("ggthemes")
+library("waffle")
+
+# Read in the CSV File
+ga_data = read.csv("5.2_ExampleFile.csv", sep=",", header=T)
+
+# Making all levels consistent
+ga_data$socialNetwork = factor(ga_data$socialNetwork, levels = ga_data$socialNetwork)
+
+# Users by Social Network
+ga_data.users <- ga_data$users
+names(ga_data.users) <- sprintf("%s (%s)", ga_data$socialNetwork, scales::percent(round(ga_data$users/sum(ga_data$users), 2)))
+ 
+# Sessions by Social Network
+ga_data.sessions <- ga_data$sessions
+names(ga_data.sessions) <- sprintf("%s (%s)", ga_data$socialNetwork, scales::percent(round(ga_data$sessions/sum(ga_data$sessions), 2)))
+
+# Goals by Social Network
+ga_data.goals = ga_data[,c("socialNetwork", "goal1Completions", "goal2Completions")]
+ga_data.goals.melt = melt(ga_data.goals, id.vars = "socialNetwork")
+
+# avgTime
+ga_data.avgTime = ga_data[,c("socialNetwork", "avgTimeOnPage")]
+
+# pageViews
+ga_data.pageViews = ga_data[,c("socialNetwork", "pageviewsPerSession")]
+
+# LengthOfAverageSession
+ga_data.sessionDuration = ga_data[,c("socialNetwork", "avgSessionDuration")]
+
+
+```
+
+Visitors by Network {data-navmenu="Traffic"}
+=====================================
+
+```{r}
+waffle(ga_data.users/50, rows = 10, legend_pos = "bottom", title="Visitors by Social Network", xlab="1 square = 50 visitors")
+```
+
+
+Sessions by Network {data-navmenu="Traffic"}
+=====================================
+
+```{r}
+waffle(ga_data.sessions/50, rows = 10, legend_pos = "bottom", title="Sessions by Social Network", xlab="1 square = 50 sessions")
+```
+
+Goals by Network {data-navmenu="Revenue and Goals"}
+=====================================
+```{r}
+ggplot(ga_data.goals.melt, aes(socialNetwork, value)) + geom_bar(aes(fill = variable), width = 0.6, position = position_dodge(width = 0.7), stat = "identity",colour="black") + xlab("Social Network") + ylab("Completions") + theme_minimal() + scale_fill_manual(values = c("#de2d26", "#3182bd"), name="Goals", breaks=c("goal1Completions", "goal2Completions"),labels=c("Purchases", "Subscriptions"))
+
+```   
+ 
+Average Time on Page {data-navmenu="Engagement"}
+=====================================
+
+```{r}
+ggplot(ga_data.avgTime, aes(x=socialNetwork, y=avgTimeOnPage)) + 
+  geom_bar(stat="identity", width=.5, fill="#00A087B2", colour="black") + theme_bw() + theme(axis.text.x = element_text(angle = 90, hjust = 1)) + labs(title="Average Time on Page", subtitle="November 2017",x = "Social Network", y="Seconds") 
+```
+
+
+Average PageViews {data-navmenu="Engagement"}
+=====================================
+ 
+```{r}
+ggplot(ga_data.pageViews, aes(x=socialNetwork, y=pageviewsPerSession)) + 
+  geom_bar(stat="identity", width=.5, fill="#3C5488B2", colour="black") + theme_bw() + theme(axis.text.x = element_text(angle = 90, hjust = 1)) + labs(title="Average Pageviews", subtitle="November 2017",x = "Social Network", y="PageViews") 
+
+
+```
+
+Average Session Duration {data-navmenu="Engagement"}
+=====================================
+
+```{r}
+ggplot(ga_data.sessionDuration, aes(x=socialNetwork, y=avgSessionDuration)) + 
+  geom_bar(stat="identity", width=.5, fill="#E64B35B2", colour="black") + theme_bw() + theme(axis.text.x = element_text(angle = 90, hjust = 1)) + labs(title="Average Session Duration", subtitle="November 2017",x = "Social Network", y="Seconds") 
+```

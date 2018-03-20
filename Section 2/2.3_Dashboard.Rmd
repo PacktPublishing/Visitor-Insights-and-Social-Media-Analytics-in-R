@@ -1,0 +1,125 @@
+---
+title: "Revenue By Product"
+output: flexdashboard::flex_dashboard
+---
+    
+```{r setup, include=FALSE}
+library("googleAuthR")
+library("googleAnalyticsR")
+library("ggplot2")
+library("scales")
+library("gridExtra")
+library("reshape")
+library("xtable")
+
+ga_data = read.csv("RevenuePerWeek_2016-2017.csv", sep=",", header=T)
+
+# Setting up date
+ga_data$Date = as.Date(ga_data$Date, "%m/%d/%y")
+ga_data_plot = ga_data
+
+
+
+
+head(ga_data)
+ga_data_filtered_table = ga_data[which(ga_data$Date %in% as.Date(c("2017-03-26", "2017-04-02", "2017-04-09", "2017-04-16", "2017-04-23"))),]
+
+
+# for table
+ga_data_filtered_table$Product.Revenue = dollar_format()(as.numeric(ga_data_filtered_table$Product.Revenue))
+
+
+ga_data = read.csv("2.3_ProductDetailView_20170326.csv")
+# processing data
+ga_data$Product = factor(ga_data$Product, levels=ga_data$Product)
+ga_data.melted = melt(ga_data, id.vars = c("Product"))
+ga_data_week1 = ga_data.melted
+
+ga_data = read.csv("2.3_ProductDetailView_20170402.csv")
+# processing data
+ga_data$Product = factor(ga_data$Product, levels=ga_data$Product)
+ga_data.melted = melt(ga_data, id.vars = c("Product"))
+ga_data_week2 = ga_data.melted
+
+ga_data = read.csv("2.3_ProductDetailView_20170409.csv")
+# processing data
+ga_data$Product = factor(ga_data$Product, levels=ga_data$Product)
+ga_data.melted = melt(ga_data, id.vars = c("Product"))
+ga_data_week3 = ga_data.melted
+
+ga_data = read.csv("2.3_ProductDetailView_20170416.csv")
+# processing data
+ga_data$Product = factor(ga_data$Product, levels=ga_data$Product)
+ga_data.melted = melt(ga_data, id.vars = c("Product"))
+ga_data_week4 = ga_data.melted
+
+ga_data = read.csv("2.3_ProductDetailView_20170423.csv")
+# processing data
+ga_data$Product = factor(ga_data$Product, levels=ga_data$Product)
+ga_data.melted = melt(ga_data, id.vars = c("Product"))
+ga_data_week5 = ga_data.melted
+
+```
+
+Column 
+-------------------------------------
+    
+### Weekly Revenue {fig.width=6, fig.height=4} 
+    
+```{r}
+bp <- ggplot(ga_data_plot, aes(x=Date, y=Product.Revenue))+ geom_line() + scale_y_continuous( limits=c(0,35000))
+bp +ylab("Weekly Revenue") + labs(title="Weekly Revenue Plot", 
+       subtitle="September 2016 - August 2017")
+
+```
+
+### Revenue Table  {fig.width=10, fig.height=4} 
+```{r}
+ grid.table(ga_data_filtered_table)
+```
+
+   
+Column {.tabset}
+-------------------------------------
+   
+### Performance 2017/03/26 {fig.width=30 fig.height=3} 
+
+```{r}
+
+ggplot() + geom_line(data = ga_data_week1, aes(x = variable, y = value, group = Product, color = Product)) +  scale_color_manual(values=c("#9e0142","#d53e4f","#f46d43","#fdae61","#fee08b","#e6f598","#abdda4","#66c2a5","#3288bd","#5e4fa2"))+ ylab("Counts") + xlab("Sales Performance") + labs(title="Product Performance", subtitle="2017-03-26")+
+theme_grey(base_size = 6) 
+
+```   
+ 
+### Performance 2017/04/02 {fig.width=30, fig.height=3} 
+    
+```{r}
+ggplot() + geom_line(data = ga_data_week2, aes(x = variable, y = value, group = Product, color = Product)) +  scale_color_manual(values=c("#9e0142","#d53e4f","#f46d43","#fdae61","#fee08b","#e6f598","#abdda4","#66c2a5","#3288bd","#5e4fa2"))+ ylab("Counts") + xlab("Sales Performance") + labs(title="Product Performance", subtitle="2017-04-02")+
+theme_grey(base_size = 6) 
+
+```
+
+### Performance 2017/04/09 {fig.width=30, fig.height=3} 
+    
+```{r}
+ggplot() + geom_line(data = ga_data_week3, aes(x = variable, y = value, group = Product, color = Product)) +  scale_color_manual(values=c("#9e0142","#d53e4f","#f46d43","#fdae61","#fee08b","#e6f598","#abdda4","#66c2a5","#3288bd","#5e4fa2"))+ ylab("Counts") + xlab("Sales Performance") + labs(title="Product Performance", subtitle="2017-04-09")+
+theme_grey(base_size = 6) 
+
+```
+
+### Performance 2017/04/16 {fig.width=30, fig.height=3} 
+    
+```{r}
+ggplot() + geom_line(data = ga_data_week4, aes(x = variable, y = value, group = Product, color = Product)) +  scale_color_manual(values=c("#9e0142","#d53e4f","#f46d43","#fdae61","#fee08b","#e6f598","#abdda4","#66c2a5","#3288bd","#5e4fa2"))+ ylab("Counts") + xlab("Sales Performance") + labs(title="Product Performance", subtitle="2017-04-16")+
+theme_grey(base_size = 6) 
+
+```
+
+### Performance 2017/04/23 {fig.width=30, fig.height=3} 
+    
+```{r}
+ggplot() + geom_line(data = ga_data_week5, aes(x = variable, y = value, group = Product, color = Product)) +  scale_color_manual(values=c("#9e0142","#d53e4f","#f46d43","#fdae61","#fee08b","#e6f598","#abdda4","#66c2a5","#3288bd","#5e4fa2"))+ ylab("Counts") + xlab("Sales Performance") + labs(title="Product Performance", subtitle="2017-04-23")+
+theme_grey(base_size = 6) 
+
+```
+

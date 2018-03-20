@@ -1,0 +1,101 @@
+---
+title: "Campaign Comparison (October 2017)"
+output: flexdashboard::flex_dashboard
+---
+
+```{r include=FALSE}
+library("ggplot2")
+library("reshape")
+library("scales")
+library("ggsci")
+
+# Read in the CSV File
+ga_data = read.csv("4.4_ExampleFile.csv", sep=",", header=T)
+
+# Making all levels consistent
+ga_data$campaign = factor(ga_data$campaign, levels = ga_data$campaign)
+
+# Total Table for First Plot
+ga_data_filtered = ga_data[,c("campaign", "users", "newUsers", "sessions", "bounces")]
+ga_data.melted = melt(ga_data_filtered, id="campaign")
+
+
+# campaign A
+ga_data.campaignA = ga_data[2,]
+ga_data.campaignA = melt(ga_data.campaignA, id="campaign")
+ga_data.campaignA$variable = factor(c("Users", "New Users", "Sessions", "Bounces", "Order Completed (Goal1)", "Registered (Goal2)"), levels = c("Users", "New Users", "Sessions", "Bounces", "Order Completed (Goal1)", "Registered (Goal2)"))
+
+
+# campaign B
+ga_data.campaignB = ga_data[3,]
+ga_data.campaignB = melt(ga_data.campaignB, id="campaign")
+ga_data.campaignB$variable = factor(c("Users", "New Users", "Sessions", "Bounces", "Order Completed (Goal1)", "Registered (Goal2)"), levels = c("Users", "New Users", "Sessions", "Bounces", "Order Completed (Goal1)", "Registered (Goal2)"))
+
+
+# campaign C
+ga_data.campaignC = ga_data[4,]
+ga_data.campaignC = melt(ga_data.campaignC, id="campaign")
+ga_data.campaignC$variable = factor(c("Users", "New Users", "Sessions", "Bounces", "Order Completed (Goal1)", "Registered (Goal2)"), levels = c("Users", "New Users", "Sessions", "Bounces", "Order Completed (Goal1)", "Registered (Goal2)"))
+
+
+# Comparing Campaings only
+ga_data.toCompare = ga_data[c(2,3,4),c("campaign", "newUsers", "goal1Completions", "goal2Completions")]
+
+ga_data.toCompare$campaign = factor(c("Fall Campaign A", "Fall Campaign B", "Fall Campaign C"), levels = c("Fall Campaign A", "Fall Campaign B", "Fall Campaign C"))
+
+colnames(ga_data.toCompare) = c("Campaign", "New Users", "Order Completed (Goal1)", "Registered (Goal2)")
+
+ga_data.toCompare = melt(ga_data.toCompare, id.vars = "Campaign")
+
+
+
+```
+
+Overall Traffic and Goals {data-navmenu="Overall Comparisons"}
+=====================================
+
+```{r}
+
+ggplot(ga_data.melted, aes(fill=campaign, y=value, x=variable)) + 
+  geom_bar(position="dodge", stat="identity", colour="black") + theme_bw() + labs(title="Overall Traffic", subtitle="October 2017",x = "Traffic Class", y="Num Visitors") + scale_fill_manual(labels = c("No Campaign", "Fall Campaign A", "Fall Campaign B", "Fall Campaign C"), values = c("#DC0000B2", "#E64B35B2", "#00A087B2", "#3C5488B2"))
+  
+  
+  
+```
+   
+Fall Campaign A {data-navmenu="Campaign specific Goals"}
+=====================================
+
+
+```{r}
+ggplot(ga_data.campaignA, aes(x=variable, y=value)) + 
+  geom_bar(stat="identity", width=.5, fill="#DC0000B2", colour="black")  + theme_bw() + theme(axis.text.x = element_text(angle = 90, hjust = 1)) + labs(title="Traffic for Campaign A", subtitle="October 2017",x = "Metric", y="Num Visitors") 
+
+  
+```   
+ 
+Fall Campaign B {data-navmenu="Campaign specific Goals"}
+=====================================
+
+```{r}
+ggplot(ga_data.campaignB, aes(x=variable, y=value)) + 
+  geom_bar(stat="identity", width=.5, fill="#00A087B2", colour="black") + theme_bw() + theme(axis.text.x = element_text(angle = 90, hjust = 1)) + labs(title="Traffic for Campaign B", subtitle="October 2017",x = "Metric", y="Num Visitors") 
+
+```
+
+
+Fall Campaign C {data-navmenu="Campaign specific Goals"}
+=====================================
+ 
+```{r}
+
+ggplot(ga_data.campaignC, aes(x=variable, y=value)) + 
+  geom_bar(stat="identity", width=.5, fill="#3C5488B2", colour="black") + theme_bw() + theme(axis.text.x = element_text(angle = 90, hjust = 1)) + labs(title="Traffic for Campaign C", subtitle="October 2017",x = "Metric", y="Num Visitors") 
+```
+
+Comparison of Goals for Each Campaign {data-navmenu="Overall Comparisons"}
+=====================================
+
+```{r}
+ggplot(ga_data.toCompare, aes(x = Campaign, y =value ,fill = variable)) +  geom_bar(stat = "identity", position = "stack", colour="black")  +  scale_fill_startrek() +theme_bw() + labs(title="Goals Achieved by each Campaign", subtitle="October 2017",x = "Campaign", y="Num Visitors") 
+```
