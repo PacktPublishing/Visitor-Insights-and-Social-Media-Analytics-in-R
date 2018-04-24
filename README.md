@@ -19,7 +19,6 @@ After having taken this course you will be able to carry out the segmentation an
 
 ## Instructions and Navigation
 ### Assumed Knowledge
-To fully benefit from the coverage included in this course, you will need:<br/>
 This course will be most suitable for professional developers and analysts keen to understand and explore web analytics techniques using R, Google Analytics, and the Flex dashboard.
 ### Technical Requirements
 This course has the following software requirements:<br/>
